@@ -1,0 +1,78 @@
+-- Hide Delta + Toggle with Controller L2
+
+local gethui = gethui or get_hidden_gui or function()
+    return game:GetService("CoreGui")
+end
+
+local UserInputService = game:GetService("UserInputService")
+local hidden = true
+
+local function isDeltaGui(gui)
+    if not gui:IsA("ScreenGui") then return false end
+
+    local img = gui:FindFirstChildOfClass("ImageButton") or gui:FindFirstChildOfClass("ImageLabel")
+    if img then
+        local id = tostring(img.Image):lower()
+        if id:find("logo") or id:find("ninja") or id:find("delta") or id:find("hood") then
+            return true
+        end
+    end
+
+    if gui:FindFirstChild("Console")
+    or gui:FindFirstChild("Executor")
+    or gui:FindFirstChild("ScriptHub")
+    or gui:FindFirstChild("IsTween")
+    or gui:FindFirstChild("Home") then
+        return true
+    end
+
+    return false
+end
+
+local function hideDelta()
+    for _, gui in pairs(gethui():GetChildren()) do
+        if isDeltaGui(gui) then
+            gui.Enabled = false
+        end
+    end
+    hidden = true
+end
+
+local function showDelta()
+    for _, gui in pairs(gethui():GetChildren()) do
+        if isDeltaGui(gui) then
+            gui.Enabled = true
+        end
+    end
+    hidden = false
+end
+
+-- Start hidden
+hideDelta()
+
+-- Keep forcing it hidden while needed
+task.spawn(function()
+    while true do
+        task.wait(0.35)
+        if hidden then
+            hideDelta()
+        end
+    end
+end)
+
+-- Toggle with L2 (ButtonL2)
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+
+    if input.KeyCode == Enum.KeyCode.ButtonL2 then
+        if hidden then
+            showDelta()
+            print("Delta shown (L2)")
+        else
+            hideDelta()
+            print("Delta hidden (L2)")
+        end
+    end
+end)
+
+print("Controller version loaded → Press L2 to show/hide Delta")
